@@ -95,3 +95,35 @@ class Record:
         """Удаляет все записи."""
         self.records = []
         self.save()
+
+
+        # ---------- Ввод и проверка данных ----------
+
+def read_int(prompt, low, high):
+    """Запрашивает целое число в диапазоне [low, high] до тех пор, пока ввод не станет корректным."""
+    while True:
+        text = input(prompt).strip()
+        negative = text.startswith("-")
+        digits = text[1:] if negative else text
+        if not digits.isdigit():
+            print("Ошибка: введите целое число.")
+            continue
+        value = int(text)
+        if value < low or value > high:
+            print("Ошибка: число должно быть от {} до {}.".format(low, high))
+            continue
+        return value
+
+
+def read_name():
+    """Запрашивает имя игрока (непустое, без символа ';')."""
+    while True:
+        name = input("Введите ваше имя: ").strip()
+        if name == "":
+            print("Ошибка: имя не может быть пустым.")
+        elif ";" in name:
+            print("Ошибка: символ ';' в имени недопустим.")
+        elif len(name) > 20:
+            print("Ошибка: имя не длиннее 20 символов.")
+        else:
+            return name
