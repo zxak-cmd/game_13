@@ -174,3 +174,28 @@ def start_game(board):
     else:
         best = board.best(level)
         print("Результат сохранён. Рекорд уровня: {} ({}).".format(best.attempts, best.name))
+
+
+        # ---------- Таблица лидеров ----------
+
+def show_leaderboard(board):
+    """Пункт меню «Таблица лидеров»."""
+    level = choose_level()
+    items = board.top(level)
+    print("\nТоп-{} — уровень «{}»".format(TOP_SIZE, LEVELS[level][0]))
+    if len(items) == 0:
+        print("Пока нет результатов.")
+        return
+    print("{:<4}{:<22}{:<9}{}".format("№", "Имя", "Попытки", "Дата"))
+    for place, rec in enumerate(items, start=1):
+        print("{:<4}{:<22}{:<9}{}".format(place, rec.name, rec.attempts, rec.played_on))
+
+
+def clear_records(board):
+    """Пункт меню «Сбросить рекорды» (с подтверждением)."""
+    answer = input("Удалить все рекорды? (да/нет): ").strip().lower()
+    if answer == "да":
+        board.clear()
+        print("Рекорды удалены.")
+    else:
+        print("Отменено.")
