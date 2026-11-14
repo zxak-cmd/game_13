@@ -199,3 +199,35 @@ def clear_records(board):
         print("Рекорды удалены.")
     else:
         print("Отменено.")
+
+
+        # ---------- Главное меню ----------
+
+def print_menu():
+    print("\n=== УГАДАЙ ЧИСЛО ===")
+    print("1. Новая игра")
+    print("2. Таблица лидеров")
+    print("3. Сбросить рекорды")
+    print("0. Выход")
+
+
+def main():
+    board = Leaderboard(RECORDS_FILE)
+    board.load()
+
+    while True:
+        print_menu()
+        choice = read_int("Ваш выбор: ", 0, 3)
+        if choice == 1:
+            start_game(board)
+        elif choice == 2:
+            show_leaderboard(board)
+        elif choice == 3:
+            clear_records(board)
+        else:
+            print("До свидания!")
+            break
+
+
+if __name__ == "__main__":
+    main()
