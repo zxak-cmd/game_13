@@ -1,39 +1,41 @@
 """Главный модуль: меню программы и точка входа."""
 
 import logging
-from config import RECORDS_FILE, LEVELS, TOP_SIZE  # Импортируем всё нужное из конфига
+
+from config import LEVELS, RECORDS_FILE, TOP_SIZE
+from game import choose_level, start_game
 from storage import Leaderboard
-from utils import setup_logging, read_int
-from game import start_game, choose_level
+from utils import read_int, setup_logging
 
 
 def show_leaderboard(board):
     """Пункт меню «Таблица лидеров»."""
     level = choose_level()
     items = board.top(level)
-    # Теперь используем переменную TOP_SIZE, а не хардкод "10"
     print("\nТоп-{} — уровень «{}»".format(TOP_SIZE, LEVELS[level][0]))
-    
     if len(items) == 0:
         print("Пока нет результатов.")
         return
     print("{:<4}{:<22}{:<9}{}".format("№", "Имя", "Попытки", "Дата"))
     for place, rec in enumerate(items, start=1):
-        print("{:<4}{:<22}{:<9}{}".format(place, rec.name, rec.attempts, rec.played_on))
+        print("{:<4}{:<22}{:<9}{}".format(
+            place, rec.name, rec.attempts, rec.played_on))
 
 
 def clear_records(board):
     """Пункт меню «Сбросить рекорды» (с подтверждением)."""
     answer = input("Удалить все рекорды? (да/нет): ").strip().lower()
-    if answer == "да":
-        board.clear()
+    if answer != "да":
+        print("Отменено.")
+    elif board.clear():
         print("Рекорды удалены.")
         logging.info("Пользователь очистил таблицу лидеров.")
     else:
-        print("Отменено.")
+        print("Не удалось обновить файл рекордов.")
 
 
 def print_menu():
+    """Выводит главное меню."""
     print("\n=== УГАДАЙ ЧИСЛО ===")
     print("1. Новая игра")
     print("2. Таблица лидеров")
@@ -41,13 +43,8 @@ def print_menu():
     print("0. Выход")
 
 
-def main():
-    # Настраиваем логирование при запуске
-    setup_logging()
-    
-    board = Leaderboard(RECORDS_FILE)
-    board.load()
-
+def run_menu(board):
+    """Главный цикл меню."""
     while True:
         print_menu()
         choice = read_int("Ваш выбор: ", 0, 3)
@@ -59,8 +56,22 @@ def main():
             clear_records(board)
         else:
             print("До свидания!")
-            logging.info("=== Завершение программы ===")
-            break
+            return
+
+
+def main():
+    """Точка входа в программу."""
+    setup_logging()
+    board = Leaderboard(RECORDS_FILE)
+    if not board.load():
+        print("Не удалось прочитать файл рекордов, "
+              "начинаем с пустой таблицы.")
+    try:
+        run_menu(board)
+    except (KeyboardInterrupt, EOFError):
+        print("\nВвод прерван. До свидания!")
+        logging.info("Ввод прерван пользователем")
+    logging.info("=== Завершение программы ===")
 
 
 if __name__ == "__main__":
