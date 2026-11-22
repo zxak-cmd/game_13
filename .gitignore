@@ -1,4 +1,5 @@
 __pycache__/
 *.pyc
 records.csv
+game.log
 .venv/
